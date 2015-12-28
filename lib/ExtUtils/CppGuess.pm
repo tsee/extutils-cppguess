@@ -224,10 +224,12 @@ sub _guess_win32 {
 #    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
 
     if( $self->_cc_is_gcc( $c_compiler ) ) {
-        $self->{guess} = {
-          extra_cflags => ' -xc++ ',
-          extra_lflags => ' -lstdc++ ',
-        };
+        $self->{guess}->{extra_cflags} = ' -xc++ ';
+        
+        # Don't use -lstdc++ if Perl was linked with -static-libstdc++ (ActivePerl 5.18+ on Windows)
+        if ( $self->_config->{ldflags} !~ /static-libstdc++/ ) {
+            $self->{guess}->{extra_lflags} = ' -lstdc++ ';
+        }
     } elsif( $self->_cc_is_msvc( $c_compiler ) ) {
         $self->{guess} = {
           extra_cflags => ' -TP -EHsc ',
