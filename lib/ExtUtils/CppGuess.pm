@@ -80,6 +80,10 @@ Returns true if the detected compiler is in the gcc family.
 
 Returns true if the detected compiler is in the MS VC family.
 
+=head2 is_clang
+
+Returns true if the detected compiler is in the Clang family.
+
 =head2 add_extra_compiler_flags
 
 Takes a string as argument that is added to the string of extra compiler
@@ -223,7 +227,8 @@ sub _guess_win32 {
     my $c_compiler = $self->_cc;
 #    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
 
-    if( $self->_cc_is_gcc( $c_compiler ) ) {
+    if( $self->_cc_is_gcc( $c_compiler )
+        || $self->_cc_is_clang($c_compiler) ) {
         $self->{guess} = {
           extra_cflags => ' -xc++ ',
           extra_lflags => ' -lstdc++ ',
@@ -246,7 +251,8 @@ sub _guess_unix {
     my $c_compiler = $self->_cc;
 #    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
 
-    if( !$self->_cc_is_gcc( $c_compiler ) ) {
+    if( !$self->_cc_is_gcc( $c_compiler )
+        && !$self->_cc_is_clang( $c_compiler ) ) {
         die "Unable to determine a C++ compiler for '$c_compiler'";
     }
 
@@ -302,10 +308,12 @@ sub _cc_is_gcc {
 
     $self->{is_gcc} = 0;
     my $cc_version = _capture( "$cc --version" );
+    my $defs;
     if (
          $cc_version =~ m/\bg(?:cc|\+\+)/i # 3.x, some 4.x
       || scalar( _capture( "$cc" ) =~ m/\bgcc\b/i ) # 2.95
-      || scalar(_capture_empty_stdin("$cc -dM -E -") =~ /__GNUC__/) # more or less universal?
+      || scalar($defs = _capture_empty_stdin("$cc -dM -E -")
+                and $defs =~ /__GNUC__/ and $defs !~/__clang__/) # more or less universal?
       || scalar($cc_version =~ m/\bcc\b.*Free Software Foundation/si) # some 4.x?
     ) {
       $self->{is_gcc} = 1;
@@ -314,6 +322,20 @@ sub _cc_is_gcc {
     return $self->{is_gcc};
 }
 
+sub _cc_is_clang {
+    my( $self, $cc ) = @_;
+
+    $self->{is_clang} = 0;
+    my $cc_version = _capture( "$cc --version" );
+    if (
+         $cc_version =~ m/\bclang\b/i
+      || scalar(_capture_empty_stdin("$cc -dM -E -") =~ /__clang__/)
+    ) {
+      $self->{is_clang} = 1;
+    }
+
+    return $self->{is_clang};
+}
 
 sub is_gcc {
     my $self = shift;
@@ -327,6 +349,14 @@ sub is_msvc {
     $self->guess_compiler || die;
 
     return $self->{is_msvc};
+}
+
+sub is_clang {
+    my $self = shift;
+
+    $self->guess_compiler || die;
+
+    return $self->{is_clang};
 }
 
 sub add_extra_compiler_flags {
