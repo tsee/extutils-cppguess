@@ -1,3 +1,4 @@
+\.travis\.yml
 
 #!start included /opt/perl/modules/lib/perl5/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
