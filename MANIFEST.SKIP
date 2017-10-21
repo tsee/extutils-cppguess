@@ -19,6 +19,7 @@
 
 # Avoid Makemaker generated and utility files.
 \bMANIFEST\.bak
+\bMANIFEST\.SKIP
 \bMakefile$
 \bblib/
 \bMakeMaker-\d
