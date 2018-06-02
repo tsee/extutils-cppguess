@@ -165,6 +165,27 @@ sub guess_compiler {
 }
 
 
+sub _get_cc {
+    my $self = shift;
+
+    $self->guess_compiler or die;
+
+    my $cc = $self->{guess}->{cc};
+
+    return $cc;
+}
+
+
+sub _get_ld {
+    my $self = shift;
+
+    $self->guess_compiler or die;
+
+    my $cc = $self->{guess}->{cc};
+
+    return $cc;
+}
+
 sub _get_cflags {
     my $self = shift;
 
@@ -195,13 +216,20 @@ sub _get_lflags {
 sub makemaker_options {
     my $self = shift;
 
+    my $cc     = $self->_get_cc;
+    my $ld     = $self->_get_ld;
     my $lflags = $self->_get_lflags;
     my $cflags = $self->_get_cflags;
 
-    return (
+    my %config = (
       CCFLAGS      => $cflags,
       dynamic_lib  => { OTHERLDFLAGS => $lflags },
     );
+
+    $config{CC} = $cc if defined $cc;
+    $config{LD} = $ld if defined $ld;
+
+    %config;
 }
 
 
@@ -246,16 +274,27 @@ sub _guess_unix {
     my $c_compiler = $self->_cc;
 #    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
 
-    if( !$self->_cc_is_gcc( $c_compiler ) ) {
+    if( $self->_cc_is_gcc( $c_compiler ) ) {
+
+      $self->{guess} = {
+        extra_cflags => ' -xc++ ',
+        extra_lflags => ' -lstdc++ ',
+      };
+      $self->{guess}{extra_lflags} .= ' -lgcc_s'
+        if $self->_os eq 'netbsd' && $self->{guess}{extra_lflags} !~ /-lgcc_s/;
+
+    } elsif( $self->_cc_is_sunc( $c_compiler ) ) {
+
+      $self->{guess} = {
+        cc           => 'CC',
+        ld           => 'CC',
+        extra_cflags => '',
+        extra_lflags => ' -lCstd -lCrun ',
+      };
+
+    } else {
         die "Unable to determine a C++ compiler for '$c_compiler'";
     }
-
-    $self->{guess} = {
-      extra_cflags => ' -xc++ ',
-      extra_lflags => ' -lstdc++ ',
-    };
-    $self->{guess}{extra_lflags} .= ' -lgcc_s'
-      if $self->_os eq 'netbsd' && $self->{guess}{extra_lflags} !~ /-lgcc_s/;
 
     return 1;
 }
@@ -314,6 +353,17 @@ sub _cc_is_gcc {
     return $self->{is_gcc};
 }
 
+sub _cc_is_sunc {
+    my( $self, $cc ) = @_;
+
+    $self->{is_sunc} = 0;
+    my $cc_version = _capture( "$cc -V" );
+    if($cc_version =~ m/Sun C/) {
+      $self->{is_sunc} = 1;
+    }
+
+    return $self->{is_sunc};
+}
 
 sub is_gcc {
     my $self = shift;
