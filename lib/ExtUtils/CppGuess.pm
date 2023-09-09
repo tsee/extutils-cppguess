@@ -171,6 +171,10 @@ Given a string C<$standard_name> that is currently one of
 
 =item * C<< C++17 >>
 
+=item * C<< C++20 >>
+
+=item * C<< C++23 >>
+
 =back
 
 returns a string with a flag that can be used to tell the compiler to support
@@ -565,12 +569,16 @@ our $CPP_STANDARD_FLAGS = {
     'C++11' => [ "-std=c++11", "-std=c++0x" ],
     'C++14' => [ "-std=c++14", "-std=c++1y" ],
     'C++17' => [ "-std=c++17", "-std=c++1z" ],
+    'C++20' => [ "-std=c++20", "-std=c++2a" ],
+    'C++23' => [ "-std=c++23", "-std=c++2b" ],
   },
   is_clang => {
     'C++98' => [ "-std=c++98", ],
     'C++11' => [ "-std=c++11", ],
     'C++14' => [ "-std=c++14", "-std=c++1y" ],
     'C++17' => [ "-std=c++17", "-std=c++1z" ],
+    'C++20' => [ "-std=c++20", "-std=c++2a" ],
+    'C++23' => [ "-std=c++23", "-std=c++2b" ],
   },
   is_msvc => {
     # Newer MSVC set C++14 as minimum version.
@@ -578,6 +586,8 @@ our $CPP_STANDARD_FLAGS = {
     'C++11' => [ "" ],
     'C++14' => [ "-std:c++14" ],
     'C++17' => [ "-std:c++17" ],
+    'C++20' => [ "-std:c++20" ],
+    # no C++23 specific option as of Visual Studio 2020 17.3
   },
   is_sunstudio => {
     'C++98' => [ "" ],
