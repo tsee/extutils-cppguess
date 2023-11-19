@@ -409,7 +409,7 @@ sub _cc_is_clang {
     $self->{is_clang} = 0;
     my $cc_version = _capture( "$cc --version" );
     if (
-         $cc_version =~ m/\A(?:clang|apple llvm)/i
+         $cc_version =~ m/\A(?:(?:\S+ )?clang version|apple llvm)/i
       || $cc eq 'clang' # because why would they lie?
       || (($self->_config->{gccversion} || '') =~ /Clang|Apple LLVM/),
     ) {
