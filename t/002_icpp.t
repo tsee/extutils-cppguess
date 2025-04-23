@@ -93,7 +93,13 @@ my @METHODS = qw(
   compiler_command linker_flags
 );
 
-run_test(@$_) for @DATA;
+for (@DATA) {
+  SKIP: {
+    skip 'gcc: provided by Clang on macOS' if $^O eq 'darwin'
+      && $_->[0]{cc} eq 'gcc' && ($_->[0]{config}{gccversion} || '') ne 'Clang';
+    run_test(@$_);
+  }
+}
 
 # mock some compiler output
 my $old_capture = \&ExtUtils::CppGuess::_capture;
