@@ -101,6 +101,7 @@ our $CAPTURES;
 {
   no warnings "redefine";
   *ExtUtils::CppGuess::_capture =
+  *ExtUtils::CppGuess::_capture_empty_stdin =
     sub {
       my @cmd = @_;
       if (my $result = $CAPTURES->{"@cmd"}) {
@@ -140,7 +141,10 @@ my @CAPS =
          compiler_command => 'g++ -xc++',
          linker_flags => '-lstdc++',
        },
-       { "cc --version" => "cc (Debian 12.2.0-14) 12.2.0" },
+       {
+         "cc --version" => "cc (Debian 12.2.0-14) 12.2.0",
+         "cc -dM -E -" => "#define __GNUC__ 4",
+       },
      ],
     );
 
