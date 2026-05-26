@@ -62,7 +62,7 @@ jobs:
           - "5.14"
         include:
           - { os: 'windows-latest', perl: 'strawberry' }
-          - { os: 'ubuntu-latest' , perl: '5'         , coverage: true }
+          - { os: 'ubuntu-latest' , perl: '5'         , coverage: true, xtest: true }
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }} ${{ fromJSON('[ "", "(coverage)" ]')[ matrix.coverage ] }}
     steps:
       - name: Checkout code
@@ -102,3 +102,9 @@ jobs:
           export HARNESS_PERL_SWITCHES="-MDevel::Cover"
           perl Makefile.PL && make test
           cover -report Coveralls
+      - name: Run xtests
+        if: ${{ matrix.xtest }}
+        run: |
+          cpanm -n --installdeps --with-develop . || ( cat ~/.cpanm/build.log && false )
+          rm -f dist.tar.gz
+          prove -l xt
