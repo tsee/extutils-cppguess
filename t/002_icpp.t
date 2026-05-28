@@ -147,14 +147,16 @@ my @CAPS =
 for my $test (@CAPS) {
     my ($args, $expect, $cap) = @$test;
     local $CAPTURES = $cap;
-    run_test($args, $expect);
+    run_test($args, $expect, 1);
 }
 
 done_testing;
 
 sub run_test {
-  my ($args, $expect) = @_;
+  my ($args, $expect, $mocked) = @_;
   my $guess = ExtUtils::CppGuess->new(%$args);
   my %got = map {$_ => $guess->$_} @METHODS;
-  is_deeply \%got, $expect or diag explain [ $args, \%got, $expect ];
+  my $label = join(' ', grep $_, map $args->{$_}, qw(os cc));
+  $label .= $mocked ? " (MOCKED)" : " (not mocked)";
+  is_deeply \%got, $expect, $label or diag explain [ $args, \%got, $expect ];
 }
