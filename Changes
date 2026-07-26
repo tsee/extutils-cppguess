@@ -1,3 +1,4 @@
+0.271 2026-07-27
 - 002_icpp.t had problems on macOS since clang pretends to be "gcc" (#31) - thanks @johannessen for report
 - 002_icpp.t had problems when no "cc" available (#30 #32) - thanks @johannessen for fix
 
