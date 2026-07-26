@@ -15,33 +15,53 @@ my @DATA = (
       linker_flags => 'msvcprt.lib',
     },
   ],
-  [
-    { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => ''} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '-lstdc++',
-    },
-  ],
-  [
-    { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => 'static-libstdc++'} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '',
-    },
-  ],
-  [
-    { os => 'freebsd', cc => 'gcc', config => {ccflags => ''}, osvers => 9 },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '-lstdc++',
-    },
-  ],
+  $^O eq 'darwin' ? () : ( # "gcc" on macOS can be clang
+    [
+      { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => ''} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++',
+      },
+    ],
+    [
+      { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => 'static-libstdc++'} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '',
+      },
+    ],
+    [
+      { os => 'freebsd', cc => 'gcc', config => {ccflags => ''}, osvers => 9 },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++',
+      },
+    ],
+    [
+      { os => 'netbsd', cc => 'gcc', config => {ccflags => ''} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++ -lgcc_s',
+      },
+    ],
+    [
+      { os => 'linux', cc => 'gcc', config => {ccflags => ''} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++',
+      },
+    ],
+  ),
   [
     { os => 'freebsd', cc => 'gcc', config => {gccversion => 'Clang', ccflags => ''}, osvers => 10 },
     {
@@ -52,29 +72,11 @@ my @DATA = (
     },
   ],
   [
-    { os => 'netbsd', cc => 'gcc', config => {ccflags => ''} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '-lstdc++ -lgcc_s',
-    },
-  ],
-  [
     { os => 'linux', cc => 'clang', config => {gccversion => 'Clang', ccflags => ''} },
     {
       is_sunstudio => 0,
       is_msvc => undef, is_gcc => undef, is_clang => 1,
       compiler_command => 'clang++ -xc++ -Wno-reserved-user-defined-literal',
-      linker_flags => '-lstdc++',
-    },
-  ],
-  [
-    { os => 'linux', cc => 'gcc', config => {ccflags => ''} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++',
     },
   ],
