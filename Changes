@@ -1,4 +1,4 @@
-- 002_icpp.t had problems on macOS since clang pretends to be "gcc"
+- 002_icpp.t had problems on macOS since clang pretends to be "gcc" (#31) - thanks @johannessen for report
 
 0.27 2023-11-19
 - support C++20 and C++23 standards, and vendored version output - thanks @tonycoz
